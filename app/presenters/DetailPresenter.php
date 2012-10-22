@@ -7,7 +7,8 @@ use Nette\Http,
 	NetteAddons\Model\Addons,
 	NetteAddons\Model\AddonDownloads,
 	NetteAddons\Model\AddonVersions,
-	NetteAddons\Model\AddonVotes;
+	NetteAddons\Model\AddonVotes,
+	Nette\Caching\IStorage;
 
 
 
@@ -42,6 +43,8 @@ class DetailPresenter extends BasePresenter
 	/** @var Forms\ReportForm */
 	private $reportForm;
 
+	/** @var IStorage */
+	private $cacheStorage;
 
 
 	/**
@@ -66,6 +69,16 @@ class DetailPresenter extends BasePresenter
 	public function injectForms(Forms\ReportForm $reportForm)
 	{
 		$this->reportForm = $reportForm;
+	}
+
+
+
+	/**
+	 * @param IStorage
+	 */
+	public function injectCacheStorage(IStorage $storage)
+	{
+		$this->cacheStorage = $storage;
 	}
 
 
@@ -227,11 +240,19 @@ class DetailPresenter extends BasePresenter
 			$myVote = NULL;
 		}
 
+		$addonId = $this->addon->id;
 		$statsFrom = new \DateTime('- 7 days');
 		$statsFrom->setTime(0, 0, 0);
 		$statsTo = new \DateTime('yesterday');
 		$statsTo->setTime(23, 59, 59);
-		$usageStatistics = $this->addonDownloads->findDownloadUsage($this->addon->id, $statsFrom, $statsTo);
+
+		$statsCache = new \Nette\Caching\Cache($this->cacheStorage, 'Addon.Detail.Stats');
+		$usageStatistics = $statsCache->load(
+			sprintf('%d/%s_%s', $addonId, $statsFrom->format('Y-m-d'), $statsTo->format('Y-m-d')),
+			function () use ($addonId, $statsFrom, $statsTo) {
+				return $this->addonDownloads->findDownloadUsage($addonId, $statsFrom, $statsTo);
+			}
+		);
 
 		$this['subMenu']->setAddon($this->addon);
 
