@@ -227,6 +227,12 @@ class DetailPresenter extends BasePresenter
 			$myVote = NULL;
 		}
 
+		$statsFrom = new \DateTime('- 7 days');
+		$statsFrom->setTime(0, 0, 0);
+		$statsTo = new \DateTime('yesterday');
+		$statsTo->setTime(23, 59, 59);
+		$usageStatistics = $this->addonDownloads->findDownloadUsage($this->addon->id, $statsFrom, $statsTo);
+
 		$this['subMenu']->setAddon($this->addon);
 
 		$this->template->addon = $this->addon;
@@ -237,5 +243,6 @@ class DetailPresenter extends BasePresenter
 		$this->template->minus = $popularity->minus;
 		$this->template->percents = $popularity->percent;
 		$this->template->myVote = $myVote;
+		$this->template->usageStatistics = $usageStatistics;
 	}
 }
