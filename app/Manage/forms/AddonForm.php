@@ -83,8 +83,10 @@ class AddonForm extends \NetteAddons\Forms\BaseForm
 			->addRule(self::URL);
 		$this->addText('shortDescription', 'Short description', NULL, 250)
 			->setRequired();
-		$this->addTextArea('description', 'Description')
-			->setRequired();
+		$ta = new \NetteAddons\Components\FullscreenTextarea();
+		$this->addComponent($ta, 'description');
+		/*$this->addTextArea('description', 'Description')
+			->setRequired();*/
 		$this->addRadioList('descriptionFormat', 'Description format', $this->descriptionFormats)
 			->setDefaultValue(key($this->descriptionFormats))
 			->setRequired();

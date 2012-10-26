@@ -59,4 +59,16 @@ $(document).ready(function() {
 			chart.draw(data, options);
 		} });
 	}
+
+	// fullscreen textarea
+	$('.fullscreen-textarea').each(function (i, el) {
+		var link = $(el).find('a.open');
+		link.on('click', function (e) {
+			/*$.getJSON(this.href, function (payload) {
+				link.parent().append(payload.tpl);
+			});*/
+			return false;
+		});
+	});
+
 });
